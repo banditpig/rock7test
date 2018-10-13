@@ -27,8 +27,8 @@ public class MainApplication {
 
   @PostConstruct
   public void init() throws IOException {
-//    Race race = jsonIO.fromJSON(jsonIO.fromFile("positions.json"));
-//    raceRepository.save(race);
+    Race race = jsonIO.fromJSON(jsonIO.fromFile("positions.json"));
+    raceRepository.save(race);
 
 //    positionRepository.findAll().forEach(p -> System.out.println(p));
   }
