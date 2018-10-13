@@ -1,6 +1,5 @@
-package rock7.gis.rw;
+package rock7.gis.processing;
 
-import javafx.geometry.Pos;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
@@ -35,7 +34,6 @@ public class MapUtils {
     return positions.stream()
         .filter(p -> sameDay(p.getGpsAt(), thatDay))
         .collect(Collectors.toList());
-
   }
 
   public List<DateTime> uniqueDays(List<Position> positions) {
@@ -78,9 +76,8 @@ public class MapUtils {
       if( !sameDay(fixedPos.getGpsAt(), currentPos.getGpsAt())){
         tooLate = true;
       }else{
-
         //maybe nearby?
-        if (checkForLocal(fixedPos, currentPos)){
+        if (positionsCloseTogether(fixedPos, currentPos)){
           matchCount++;
         }
       }
@@ -89,8 +86,8 @@ public class MapUtils {
 
     return matchCount;
   }
-  public boolean checkForLocal(Position p1, Position p2){
-    //expect them to be on same day. time within +/- delta
+  public boolean positionsCloseTogether(Position p1, Position p2){
+    //expect them to be on same day.
     // lat long are local too
     DateTime t1 = p1.getGpsAt();
     DateTime t2 = p2.getGpsAt();

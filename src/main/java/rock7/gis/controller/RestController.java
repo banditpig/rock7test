@@ -12,7 +12,7 @@ import rock7.gis.entity.StatsWrapper;
 import rock7.gis.repos.PositionRepository;
 import rock7.gis.repos.RaceRepository;
 import rock7.gis.repos.TeamRepository;
-import rock7.gis.rw.MapUtils;
+import rock7.gis.processing.MapUtils;
 
 import java.util.*;
 

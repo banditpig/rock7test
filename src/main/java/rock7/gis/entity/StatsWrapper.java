@@ -8,6 +8,7 @@ import java.util.List;
  * Created by mikehoughton on 13/10/2018.
  */
 public class StatsWrapper {
+
   private double minDist;
   private double maxDist;
   private double avgDist;

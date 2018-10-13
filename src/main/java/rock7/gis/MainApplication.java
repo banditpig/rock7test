@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import rock7.gis.repos.PositionRepository;
 import rock7.gis.entity.Race;
 import rock7.gis.repos.RaceRepository;
-import rock7.gis.rw.JsonIO;
+import rock7.gis.processing.JsonIO;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -30,7 +30,6 @@ public class MainApplication {
     Race race = jsonIO.fromJSON(jsonIO.fromFile("positions.json"));
     raceRepository.save(race);
 
-//    positionRepository.findAll().forEach(p -> System.out.println(p));
   }
   public static void main(String[] args) {
     SpringApplication.run(MainApplication.class, args);

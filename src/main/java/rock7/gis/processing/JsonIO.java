@@ -1,13 +1,10 @@
-package rock7.gis.rw;
+package rock7.gis.processing;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import rock7.gis.entity.Position;
 import rock7.gis.entity.Race;
 import rock7.gis.entity.Team;
 
@@ -15,11 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 @Component
 public class JsonIO {
