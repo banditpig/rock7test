@@ -20,7 +20,7 @@ public class MapUtils {
 
   private static final CompletionService<SightTaskWrapper> taskCompletionService = new ExecutorCompletionService<SightTaskWrapper>(executorService);
 
-  //  1.17 times the square root of your height of eye in feet
+  //  1.17 times the square root of  height of eye in feet
   // = Distance to the horizon in nautical miles.
   // Say 12 feet  high - gives around 7.5 km
   private static final double HORIZON_DISTANCE = 7.5;
