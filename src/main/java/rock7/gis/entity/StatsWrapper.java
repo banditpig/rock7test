@@ -1,6 +1,6 @@
 package rock7.gis.entity;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mikehoughton on 13/10/2018.
@@ -13,7 +13,7 @@ public class StatsWrapper {
   private double totalDist;
   private String minName;
   private String maxName;
-  private List<String> nameDist;
+  private Map<Double, String>  nameDist;
 
   public StatsWrapper withMinDist(double minDist) {
     this.minDist = minDist;
@@ -45,7 +45,7 @@ public class StatsWrapper {
     return this;
   }
 
-  public StatsWrapper withNameDist(List<String> nameDist) {
+  public StatsWrapper withNameDist(Map<Double, String> nameDist) {
     this.nameDist = nameDist;
     return this;
   }
@@ -94,11 +94,11 @@ public class StatsWrapper {
     this.maxName = maxName;
   }
 
-  public List<String> getNameDist() {
+  public Map<Double, String> getNameDist() {
     return nameDist;
   }
 
-  public void setNameDist(List<String> nameDist) {
+  public void setNameDist(Map<Double, String> nameDist) {
     this.nameDist = nameDist;
   }
 }

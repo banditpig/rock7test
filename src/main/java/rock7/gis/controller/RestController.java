@@ -96,11 +96,11 @@ public class RestController {
   }
   private StatsWrapper calcStats(){
 
-    Map<String, Double> nameDistanceMap = new TreeMap<>();
+    Map<Double, String> nameDistanceMap = new TreeMap<>();
 
     teamRepository.findAll().forEach(t -> {
           double current =  mapUtils.totalDistanceTravelled(t.postitionByTime());
-          nameDistanceMap.put(t.getName(), current );
+          nameDistanceMap.put(current, mapUtils.makeKey(t)  );
         }
     );
 
@@ -110,26 +110,23 @@ public class RestController {
     String minName = "";
     String maxName = "";
     double total = 0;
-    List<String> nameDist = new ArrayList<>();
-    for(String name: nameDistanceMap.keySet()){
-      total += nameDistanceMap.get(name);
+    for(Double d: nameDistanceMap.keySet()){
+      total += d;
 
-      double current = nameDistanceMap.get(name);
-      if (current > maxDist ) {
-        maxDist = current;
-        maxName = name;
+      if (d > maxDist ) {
+        maxDist = d;
+        maxName = nameDistanceMap.get(d);
       }
-      if (current < minDist ){
-        minDist = current;
-        minName = name;
+      if (d < minDist ){
+        minDist = d;
+        minName = nameDistanceMap.get(d);;
       }
-      nameDist.add(name + ":" + String.format("%.0f", current ));
     }
 
 
    return new StatsWrapper()
         .withAvgDist(total/nameDistanceMap.keySet().size())
-        .withNameDist(nameDist)
+        .withNameDist(nameDistanceMap)
         .withTotalDist(total)
         .withMaxDist(maxDist)
         .withMinDist(minDist)

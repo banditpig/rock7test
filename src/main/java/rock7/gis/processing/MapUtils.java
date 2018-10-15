@@ -123,7 +123,10 @@ public class MapUtils {
     }
     return false;
   }
-
+  public String makeKey(Team team){
+    //name is not unique. (Ellen...)
+    return team.getName() + " - " + team.getSerial();
+  }
   private boolean positionsCloseTogether(Position p1, Position p2){
     //expect them to be on same day.
 
@@ -134,10 +137,7 @@ public class MapUtils {
     if (distance <= HORIZON_DISTANCE) return true;
     return false;
   }
-  private String makeKey(Team team){
-    //name is not unique. (Ellen...)
-    return team.getName() + " - " + team.getSerial();
-  }
+
   private Callable< SightTaskWrapper > sightTask(String teamOneName, String teamTwoName, List<Position> ps1,List<Position> ps2 ){
     return new Callable<SightTaskWrapper>() {
       @Override
@@ -245,6 +245,7 @@ public class MapUtils {
     JsonIO jsonIO = new JsonIO();
     MapUtils mapUtils = new MapUtils();
 
+
     Race race = jsonIO.fromJSON(jsonIO.fromFile("positions.json"));
 
     DateTime t3 = new DateTime("2017-12-06T08:00:00.000Z");
@@ -265,16 +266,12 @@ public class MapUtils {
     for (String name: m.keySet()){
       Map<DateTime, Integer> next =  m.get(name);
       start =  mapUtils.mergeMaps(next,start);
-
-
     }
 
     for(DateTime d : start.keySet()){
       System.out.println(d + " " + start.get(d));
       total += start.get(d);
     }
-
-
     System.out.println("-> " + total);
 
   }
