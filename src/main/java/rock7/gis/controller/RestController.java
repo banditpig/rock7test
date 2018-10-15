@@ -1,19 +1,21 @@
 package rock7.gis.controller;
 
+import com.google.common.collect.Lists;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import rock7.gis.entity.Position;
-import rock7.gis.entity.Race;
-import rock7.gis.entity.StatsWrapper;
+import rock7.gis.entity.*;
 import rock7.gis.repos.PositionRepository;
 import rock7.gis.repos.RaceRepository;
+import rock7.gis.repos.SightingRepo;
 import rock7.gis.repos.TeamRepository;
 import rock7.gis.processing.MapUtils;
 
+import java.time.DateTimeException;
 import java.util.*;
 
 /**
@@ -30,6 +32,9 @@ public class RestController {
   private PositionRepository positionRepository;
   @Autowired
   private TeamRepository teamRepository;
+
+  @Autowired
+  private SightingRepo sightingRepository;
 
   @Autowired
   private MapUtils mapUtils;
@@ -71,7 +76,25 @@ public class RestController {
     return positionList;
 
   }
+  @GetMapping(path = "/sightings/generate")
+  public @ResponseBody Iterable<Sighting> generateSightings() {
+    teamRepository.findAll();
 
+     Map<String, Map<DateTime, Integer>> sightData = mapUtils.teamSiteings(Lists.newArrayList(teamRepository.findAll()));
+
+     for (String name: sightData.keySet()){
+       Map<DateTime, Integer> sights = sightData.get(name);
+
+       List<Sighting> sightingList = new ArrayList<>();
+       for (DateTime dt : sights.keySet()){
+         Sighting sighting = new Sighting(name, dt,sights.get(dt));
+         sightingList.add(sighting);
+       }
+       sightingRepository.saveAll(sightingList);
+     }
+
+     return sightingRepository.findAll();
+  }
   private StatsWrapper calcStats(){
 
     Map<String, Double> nameDistanceMap = new TreeMap<>();

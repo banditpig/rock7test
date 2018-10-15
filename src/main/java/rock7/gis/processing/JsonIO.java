@@ -69,7 +69,7 @@ public class JsonIO {
     // dh.uniqueDays(teams.get(10).getPositions()).forEach(d -> System.out.println(d));
     System.out.println();
     DateTime day0 = new DateTime("2017-11-19T00:00:00.000Z");
-    System.out.println(mapUtils.forThatDay(teams.get(10).postitionByTime(), day0).size());
+    System.out.println(mapUtils.positionsForThatDay(teams.get(10).postitionByTime(), day0).size());
 
   }
 }
