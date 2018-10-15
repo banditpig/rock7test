@@ -91,13 +91,15 @@ public class MapUtils {
     if (uniqueDays1.size() > uniqueDays2.size()){
       uniqueDays = uniqueDays1;
     }
-    //check for at most one match on each day
+
     for(DateTime day : uniqueDays){
       List<Position> list1Day = positionsForThatDay(posList1, day);
       List<Position> list2Day = positionsForThatDay(posList2, day);
 
+      //sighting will check for at most one match on each day
       if  (sighting(list1Day, list2Day)){
         dayCountMap.put(day, 1);
+
       }else{
         dayCountMap.put(day, 0);
       }
@@ -175,13 +177,15 @@ public class MapUtils {
 
     Map<String, Map<DateTime, Integer>  > teamSiteings = new TreeMap<>();
 
+    //
     for(int ix = 0; ix < teams.size(); ix++){
       List<Position> ps1 = teams.remove(ix).postitionByTime();
 
       for(Team team : teams ){
         Map<DateTime, Integer> dayCountMap = processPosLists(ps1, team.postitionByTime());
 
-
+        //TODO should be for BOTH team name here. So include both or none in the final output.
+        //TODO if A can see B then B can see A
         if (teamSiteings.containsKey(team.getName())){
           Map<DateTime, Integer> prevMap = teamSiteings.get(team.getName());
           Map<DateTime, Integer> newMap = mergeMaps(prevMap, dayCountMap );
@@ -223,7 +227,7 @@ public class MapUtils {
     List<Team> teams = race.getTeams();
     List<Position> ps1 = teams.get(56).postitionByTime();
     List<Position> ps2= teams.get(123).postitionByTime();
-    Map<String, Map<DateTime, Integer>  > m = mapUtils.teamSiteings(teams.subList(0,1));
+    Map<String, Map<DateTime, Integer>  > m = mapUtils.teamSiteings(teams.subList(0,15));
     int total = 0;
 
     Map<DateTime, Integer> start = new TreeMap<>();
@@ -237,6 +241,7 @@ public class MapUtils {
     for(DateTime d : start.keySet()){
 
       System.out.println(d + " " + start.get(d));
+      total += start.get(d);
     }
 //    for(String name : m.keySet()){
 //      System.out.println(name );
