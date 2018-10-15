@@ -3,8 +3,10 @@ package rock7.gis.entity;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
  * Created by mikehoughton on 13/10/2018.
@@ -15,6 +17,8 @@ public final class Sighting {
   @Id
   @GeneratedValue(strategy= GenerationType.AUTO) long id;
 
+  //The team doing the sighting. There's probably enough info in
+  // mapUtils.teamSiteings to get the team being sighted.
   private String teamName;
 
   @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")

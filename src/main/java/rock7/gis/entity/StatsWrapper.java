@@ -1,7 +1,5 @@
 package rock7.gis.entity;
 
-import rock7.gis.controller.RestController;
-
 import java.util.List;
 
 /**

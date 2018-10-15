@@ -8,19 +8,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import rock7.gis.entity.*;
+import rock7.gis.entity.Position;
+import rock7.gis.entity.Race;
+import rock7.gis.entity.Sighting;
+import rock7.gis.entity.StatsWrapper;
+import rock7.gis.processing.MapUtils;
 import rock7.gis.repos.PositionRepository;
 import rock7.gis.repos.RaceRepository;
 import rock7.gis.repos.SightingRepo;
 import rock7.gis.repos.TeamRepository;
-import rock7.gis.processing.MapUtils;
 
-import java.time.DateTimeException;
 import java.util.*;
 
-/**
- * Created by mikehoughton on 12/10/2018.
- */
 @Controller
 @RequestMapping(path="/rock7")
 public class RestController {

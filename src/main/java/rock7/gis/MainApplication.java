@@ -3,10 +3,10 @@ package rock7.gis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import rock7.gis.repos.PositionRepository;
 import rock7.gis.entity.Race;
-import rock7.gis.repos.RaceRepository;
 import rock7.gis.processing.JsonIO;
+import rock7.gis.repos.PositionRepository;
+import rock7.gis.repos.RaceRepository;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;

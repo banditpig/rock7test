@@ -8,16 +8,22 @@ import java.util.Map;
  * Created by mikehoughton on 15/10/2018.
  */
 public class SightTaskWrapper {
-  private String teamName;
+  private String teamOneName;
+  private String teamTwoName;
   private Map<DateTime, Integer> dayCountMap;
 
-  public SightTaskWrapper(String teamName, Map<DateTime, Integer> dayCountMap) {
-    this.teamName = teamName;
+  public SightTaskWrapper(String teamOneName, String teamTwoName, Map<DateTime, Integer> dayCountMap) {
+    this.teamOneName = teamOneName;
+    this.teamTwoName = teamTwoName;
     this.dayCountMap = dayCountMap;
   }
 
-  public String getTeamName() {
-    return teamName;
+  public String getTeamOneName() {
+    return teamOneName;
+  }
+
+  public String getTeamTwoName() {
+    return teamTwoName;
   }
 
   public Map<DateTime, Integer> getDayCountMap() {

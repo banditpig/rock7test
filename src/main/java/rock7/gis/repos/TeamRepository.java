@@ -1,7 +1,6 @@
 package rock7.gis.repos;
 
 import org.springframework.data.repository.CrudRepository;
-import rock7.gis.entity.Position;
 import rock7.gis.entity.Team;
 
 /**

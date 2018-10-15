@@ -3,16 +3,13 @@ package rock7.gis.processing;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import rock7.gis.entity.Race;
-import rock7.gis.entity.Team;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 @Component
 public class JsonIO {
@@ -41,35 +38,7 @@ public class JsonIO {
 
   public String fromFile(String name) throws IOException {
     Path path = new File(classLoader.getResource(name).getFile()).toPath();
-    return new String(Files.readAllBytes(path));//Paths.get(fileAndPath)));
+    return new String(Files.readAllBytes(path));
   }
 
-
-  public static void main(String[] args) throws IOException {
-
-
-    JsonIO jsonIO = new JsonIO();
-    MapUtils mapUtils = new MapUtils();
-
-    Race race = jsonIO.fromJSON(jsonIO.fromFile("positions.json"));
-
-    DateTime t3 = new DateTime("2017-12-06T08:00:00.000Z");
-    DateTime t2 = new DateTime("2017-11-19T09:00:00.000Z");
-    DateTime t1 = new DateTime("2017-11-19T11:45:00.000Z");
-
-    System.out.println(mapUtils.sameDay(t2, t1));
-    System.out.println(mapUtils.sameDay(t2, t3));
-
-    List<Team> teams = race.getTeams();
-    teams.get(10).postitionByTime().forEach(p -> System.out.println(p.getGpsAt() + " " + p.getLatitude() + " " + p.getLongitude()));
-    System.out.println();
-    System.out.println(mapUtils.totalDistanceTravelled(teams.get(10).getPositions()));
-    System.out.println(mapUtils.distance(14.27853, -54.67493, 14.31397, -55.23366));
-
-    // dh.uniqueDays(teams.get(10).getPositions()).forEach(d -> System.out.println(d));
-    System.out.println();
-    DateTime day0 = new DateTime("2017-11-19T00:00:00.000Z");
-    System.out.println(mapUtils.positionsForThatDay(teams.get(10).postitionByTime(), day0).size());
-
-  }
 }
