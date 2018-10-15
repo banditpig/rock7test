@@ -10,6 +10,7 @@ import rock7.gis.entity.Team;
 import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -17,6 +18,10 @@ import java.util.stream.Collectors;
  */
 @Component
 public class MapUtils {
+
+  private ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+  CompletionService<SightTaskWrapper> taskCompletionService = new ExecutorCompletionService<SightTaskWrapper>(executorService);
 
   private static final int TIME_DELTA = 30;
 //  1.17 times the square root of your height of eye (in feet)
@@ -78,7 +83,7 @@ public class MapUtils {
     map2.forEach((k, v) -> map3.merge(k, v, Integer::sum));
     return map3;
   }
-  public Map<DateTime, Integer> processPosLists(List<Position> posList1, List<Position> posList2 ){
+  public SightTaskWrapper processPosLists(String teamName, List<Position> posList1, List<Position> posList2 ){
 
     // Expects that lists are in ascending gps datetime order
     Map<DateTime, Integer> dayCountMap = new TreeMap<>();
@@ -105,7 +110,7 @@ public class MapUtils {
       }
     }
 
-    return dayCountMap;
+    return new SightTaskWrapper(teamName, dayCountMap);
   }
 
 
@@ -176,30 +181,64 @@ public class MapUtils {
   public   Map<String,Map<DateTime, Integer>> teamSiteings(List<Team> teams){
 
     Map<String, Map<DateTime, Integer>  > teamSiteings = new TreeMap<>();
+    List<Callable<SightTaskWrapper> > allSightTasks = new ArrayList<>();
 
-    //
+
     for(int ix = 0; ix < teams.size(); ix++){
       List<Position> ps1 = teams.remove(ix).postitionByTime();
 
       for(Team team : teams ){
-        Map<DateTime, Integer> dayCountMap = processPosLists(ps1, team.postitionByTime());
-
-        //TODO should be for BOTH team name here. So include both or none in the final output.
-        //TODO if A can see B then B can see A
-        if (teamSiteings.containsKey(team.getName())){
-          Map<DateTime, Integer> prevMap = teamSiteings.get(team.getName());
-          Map<DateTime, Integer> newMap = mergeMaps(prevMap, dayCountMap );
-          teamSiteings.put(team.getName(), newMap);
-        }else{
-          teamSiteings.put(team.getName(), dayCountMap);
-        }
+        allSightTasks.add(sightTask(team.getName(), ps1,team.postitionByTime() ));
       }
 
     }
+    //we've made all the tasks. So now submit them.
+    for (Callable<SightTaskWrapper> callable : allSightTasks) {
+      taskCompletionService.submit(callable);
+    }
+    for (int i = 0; i < allSightTasks.size(); i++) {
+      try {
+
+        Future<SightTaskWrapper> taskWrapper= taskCompletionService.take();
+
+        Map<DateTime, Integer> dayCountMap = taskWrapper.get().getDayCountMap();
+        String teamName = taskWrapper.get().getTeamName();
+        //TODO should be for BOTH team name here. So include both or none in the final output.
+        //TODO if A can see B then B can see A
+        if (teamSiteings.containsKey(teamName)){
+          Map<DateTime, Integer> prevMap = teamSiteings.get(teamName);
+          Map<DateTime, Integer> newMap = mergeMaps(prevMap, dayCountMap );
+          teamSiteings.put(teamName, newMap);
+        }else{
+          teamSiteings.put(teamName, dayCountMap);
+        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      } catch (ExecutionException e) {
+        e.printStackTrace();
+      }
+
+    }
+    executorService.shutdown();
     return teamSiteings;
 
 
 
+  }
+
+  private Callable< SightTaskWrapper > sightTask(String teamName, List<Position> ps1,List<Position> ps2 ){
+    return new Callable<SightTaskWrapper>() {
+      /**
+       * Computes a result, or throws an exception if unable to do so.
+       *
+       * @return computed result
+       * @throws Exception if unable to compute a result
+       */
+      @Override
+      public SightTaskWrapper call() throws Exception {
+        return processPosLists(teamName, ps1, ps2);
+      }
+    };
   }
   public static void main(String[] args) throws IOException {
     JsonIO jsonIO = new JsonIO();
@@ -227,7 +266,7 @@ public class MapUtils {
     List<Team> teams = race.getTeams();
     List<Position> ps1 = teams.get(56).postitionByTime();
     List<Position> ps2= teams.get(123).postitionByTime();
-    Map<String, Map<DateTime, Integer>  > m = mapUtils.teamSiteings(teams.subList(0,15));
+    Map<String, Map<DateTime, Integer>  > m = mapUtils.teamSiteings(teams);
     int total = 0;
 
     Map<DateTime, Integer> start = new TreeMap<>();
