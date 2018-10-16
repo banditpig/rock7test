@@ -19,7 +19,7 @@ nautical miles. Say 12 feet  high - gives around 7.5 km.
 The code that generates the sighting data is multi-threaded and executes in less than 4 seconds. 
 (See teamSiteings method in class MapUtils)
 The code to write the data into  mySQL has not been optimised - doing so is important but really
-an exercise in configuration rather than one of coding. 
+an exercise in configuration rather than one of coding. There are no unit tests. Production code would have unit tests.
 
 The whole application can be run as a local server on port 8080. It exports several endpoints.
 
