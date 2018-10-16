@@ -66,6 +66,7 @@ public class MapUtils {
     for (Callable<SightTaskWrapper> callable : allSightTasks) {
       taskCompletionService.submit(callable);
     }
+    //and collect the results...
     for (int i = 0; i < allSightTasks.size(); i++) {
       try {
 
