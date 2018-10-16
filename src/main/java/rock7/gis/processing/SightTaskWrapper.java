@@ -4,10 +4,8 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * Created by mikehoughton on 15/10/2018.
- */
-public class SightTaskWrapper {
+
+public final class SightTaskWrapper {
   private String teamOneName;
   private String teamTwoName;
   private Map<DateTime, Integer> dayCountMap;

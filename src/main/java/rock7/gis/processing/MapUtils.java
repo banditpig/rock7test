@@ -5,12 +5,12 @@ import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import rock7.gis.entity.Position;
-import rock7.gis.entity.Race;
 import rock7.gis.entity.Team;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
@@ -31,6 +31,7 @@ public class MapUtils {
   private Boolean justOneSightingRequired;
 
   public Double totalDistanceTravelled(List<Position> positions) {
+
     double total = 0;
     int ix = 0;
     while (ix < positions.size() - 1) {
@@ -40,8 +41,15 @@ public class MapUtils {
     return total;
   }
 
+  public String makeKey(Team team){
+    //name is not unique. (e.g. Ellen)
+    return team.getName() + " - " + team.getSerial();
+  }
   public  Map<String,Map<DateTime, Integer>> teamSiteings(List<Team> teams){
 
+    /*
+    Compare each team in turn to the others. Use concurrency utils compute results.
+     */
     Map<String, Map<DateTime, Integer>  > teamSiteings = new TreeMap<>();
     List<Callable<SightTaskWrapper> > allSightTasks = new ArrayList<>();
 
@@ -92,7 +100,7 @@ public class MapUtils {
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       } catch (ExecutionException e) {
-        e.printStackTrace();
+        Logger.getAnonymousLogger().log(Level.WARNING, e.toString());
       }
 
     }
@@ -105,6 +113,7 @@ public class MapUtils {
 
     List<Position> srcList;
     List<Position> trgList;
+    //iterate over longest data set.
     if (posList1.size() < posList2.size() ){
       srcList = posList2;
       trgList = posList1;
@@ -123,16 +132,14 @@ public class MapUtils {
           if (positionsCloseTogether(srcPos, trgPos)){
             matchCount++;
             if (justOneSightingRequired) return matchCount;
+            //Otherwise continue building up matchCount
           }
         }
       }
     }
     return matchCount;
   }
-  public String makeKey(Team team){
-    //name is not unique. (Ellen...)
-    return team.getName() + " - " + team.getSerial();
-  }
+
   private boolean positionsCloseTogether(Position p1, Position p2){
     //expect them to be on same day.
 
@@ -169,13 +176,8 @@ public class MapUtils {
     for(DateTime day : uniqueDays){
       List<Position> list1Day = positionsForThatDay(posList1, day);
       List<Position> list2Day = positionsForThatDay(posList2, day);
-      //sighting will check for at most one match on each day
+
       dayCountMap.put(day, sighting(list1Day, list2Day));
-//      if  (sighting(list1Day, list2Day)){
-//        dayCountMap.put(day, 1);
-//      }else{
-//        dayCountMap.put(day, 0);
-//      }
     }
 
     return new SightTaskWrapper(teamOneName,teamTwoName, dayCountMap);
@@ -199,8 +201,10 @@ public class MapUtils {
 
 
 
+  /*
+   No real need for spherical trignometry.
+   */
   private Double distance(double lat, double lng, double lat0, double lng0) {
-    //http://jonisalonen.com/2014/computing-distance-between-coordinates-can-be-simple-and-fast/
     double x = lat - lat0;
     double y = (lng - lng0) * Math.cos(lat0);
 
@@ -216,16 +220,11 @@ public class MapUtils {
   }
 
 
-  private Double distance(Position p, Position p0) {
-    /*
-    Ignore spherical geometry.
-     */
-    double x = p.getLatitude().doubleValue() - p0.getLatitude().doubleValue();
-    double y = (p.getLongitude().doubleValue() - p0.getLongitude().doubleValue()) * Math.cos(p0.getLatitude().doubleValue());
+  private Double distance(Position p, Position p0){
 
-    return 110.25 * Math.sqrt(x * x + y * y);
-
-  }
+    return distance(p.getLatitude().doubleValue(),p.getLongitude().doubleValue(),
+                    p0.getLatitude().doubleValue(), p0.getLongitude().doubleValue());
+}
 
   private List<Position> positionsForThatDay(List<Position> positions, DateTime thatDay) {
     //ie all observations on that day
@@ -235,7 +234,7 @@ public class MapUtils {
   }
 
   private List<DateTime> uniqueDays(List<Position> positions) {
-    //unique days - ignore time
+    //unique days - ignore time part of the DateTime
     Set<DateTime> uniqueDays = new TreeSet<>(); //natural sort order
     positions.stream().forEach(p -> uniqueDays.add(p.getGpsAt().withTimeAtStartOfDay()));
     return new ArrayList<>(uniqueDays);
@@ -247,38 +246,5 @@ public class MapUtils {
     Interval theDay = new Interval(t1.withTimeAtStartOfDay(), t1.plusDays(1).withTimeAtStartOfDay());
     return theDay.contains(t2);
   }
-  public static void main(String[] args) throws IOException {
-    JsonIO jsonIO = new JsonIO();
-    MapUtils mapUtils = new MapUtils();
 
-
-    Race race = jsonIO.fromJSON(jsonIO.fromFile("positions.json"));
-
-    DateTime t3 = new DateTime("2017-12-06T08:00:00.000Z");
-    DateTime t2 = new DateTime("2017-11-19T09:00:00.000Z");
-    DateTime t1 = new DateTime("2017-11-19T11:45:00.000Z");
-
-    System.out.println(mapUtils.sameDay(t2, t1));
-    System.out.println(mapUtils.sameDay(t2, t3));
-
-
-    List<Team> teams = race.getTeams();
-
-
-    Map<String, Map<DateTime, Integer>  > m = mapUtils.teamSiteings(teams);
-    int total = 0;
-
-    Map<DateTime, Integer> start = new TreeMap<>();
-    for (String name: m.keySet()){
-      Map<DateTime, Integer> next =  m.get(name);
-      start =  mapUtils.mergeMaps(next,start);
-    }
-
-    for(DateTime d : start.keySet()){
-      System.out.println(d + " " + start.get(d));
-      total += start.get(d);
-    }
-    System.out.println("-> " + total);
-
-  }
 }

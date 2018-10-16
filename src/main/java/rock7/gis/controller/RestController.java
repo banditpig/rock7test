@@ -84,13 +84,13 @@ public class RestController {
      for (String name: sightData.keySet()){
        Map<DateTime, Integer> sights = sightData.get(name);
 
-
        for (DateTime dt : sights.keySet()){
          Sighting sighting = new Sighting(name, dt,sights.get(dt));
          sightingList.add(sighting);
        }
 
      }
+
      sightingRepository.saveAll(sightingList);
      return sightingRepository.findAll();
   }
