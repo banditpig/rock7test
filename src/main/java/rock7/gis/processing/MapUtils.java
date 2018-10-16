@@ -2,6 +2,7 @@ package rock7.gis.processing;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import rock7.gis.entity.Position;
 import rock7.gis.entity.Race;
@@ -25,6 +26,9 @@ public class MapUtils {
   // Say 12 feet  high - gives around 7.5 km
   private static final double HORIZON_DISTANCE = 7.5;
 
+
+  @Value("${sighting.justOne}")
+  private Boolean justOneSightingRequired;
 
   public Double totalDistanceTravelled(List<Position> positions) {
     double total = 0;
@@ -66,7 +70,7 @@ public class MapUtils {
         //From here we could get more sophisticated.
         //Eg. have both teams in the db so we can see
         //how many times X spotted Y, and when. Or who was seen the most
-        //... teamOneName + " " + teamTwoName
+        //...
 
         if (teamSiteings.containsKey(teamOneName)){
           Map<DateTime, Integer> prevMap = teamSiteings.get(teamOneName);
@@ -97,7 +101,7 @@ public class MapUtils {
 
   }
 
-  private boolean sighting(List<Position> posList1, List<Position> posList2){
+  private int sighting(List<Position> posList1, List<Position> posList2){
 
     List<Position> srcList;
     List<Position> trgList;
@@ -109,6 +113,7 @@ public class MapUtils {
       trgList = posList2;
     }
 
+    int matchCount = 0;
     for (int i =0; i<srcList.size(); i++){
 
       Position srcPos = srcList.get(i);
@@ -116,12 +121,13 @@ public class MapUtils {
         Position trgPos = trgList.get(j);
         if (srcPos.getGpsAt().equals(trgPos.getGpsAt())){
           if (positionsCloseTogether(srcPos, trgPos)){
-            return true;
+            matchCount++;
+            if (justOneSightingRequired) return matchCount;
           }
         }
       }
     }
-    return false;
+    return matchCount;
   }
   public String makeKey(Team team){
     //name is not unique. (Ellen...)
@@ -138,7 +144,7 @@ public class MapUtils {
     return false;
   }
 
-  private Callable< SightTaskWrapper > sightTask(String teamOneName, String teamTwoName, List<Position> ps1,List<Position> ps2 ){
+  private Callable<SightTaskWrapper> sightTask(String teamOneName, String teamTwoName, List<Position> ps1,List<Position> ps2 ){
     return new Callable<SightTaskWrapper>() {
       @Override
       public SightTaskWrapper call() throws Exception {
@@ -164,12 +170,12 @@ public class MapUtils {
       List<Position> list1Day = positionsForThatDay(posList1, day);
       List<Position> list2Day = positionsForThatDay(posList2, day);
       //sighting will check for at most one match on each day
-      if  (sighting(list1Day, list2Day)){
-        dayCountMap.put(day, 1);
-
-      }else{
-        dayCountMap.put(day, 0);
-      }
+      dayCountMap.put(day, sighting(list1Day, list2Day));
+//      if  (sighting(list1Day, list2Day)){
+//        dayCountMap.put(day, 1);
+//      }else{
+//        dayCountMap.put(day, 0);
+//      }
     }
 
     return new SightTaskWrapper(teamOneName,teamTwoName, dayCountMap);

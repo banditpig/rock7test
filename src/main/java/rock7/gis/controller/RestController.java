@@ -80,18 +80,18 @@ public class RestController {
     teamRepository.findAll();
 
      Map<String, Map<DateTime, Integer>> sightData = mapUtils.teamSiteings(Lists.newArrayList(teamRepository.findAll()));
-
+     List<Sighting> sightingList = new ArrayList<>();
      for (String name: sightData.keySet()){
        Map<DateTime, Integer> sights = sightData.get(name);
 
-       List<Sighting> sightingList = new ArrayList<>();
+
        for (DateTime dt : sights.keySet()){
          Sighting sighting = new Sighting(name, dt,sights.get(dt));
          sightingList.add(sighting);
        }
-       sightingRepository.saveAll(sightingList);
-     }
 
+     }
+     sightingRepository.saveAll(sightingList);
      return sightingRepository.findAll();
   }
   private StatsWrapper calcStats(){
