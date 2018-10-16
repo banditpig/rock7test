@@ -30,6 +30,7 @@ rock7/sighting/generate - creates the sighting data. This is in file 'data.csv'.
 
 and others that just show position data etc.
 
+
 A number of SQL queries have been run against the sighting data:
 ---------------------------------------------------------------
 
